@@ -19,7 +19,11 @@ public class GameManager : MonoBehaviour
 
     public static gameState currentGameState;
 
-    private static int score;
+    // change to static methods
+    public static bool dodgeDisabled = false;
+    public static bool playerMove = true;
+
+    private static int score = 0;
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
@@ -41,8 +45,8 @@ public class GameManager : MonoBehaviour
         currentGameState++;
     }
 
-    public static void increaseScore(){
-        score += 10;
+    public static void increaseScore(int value){
+        score += value;
         updateScoreText();
     }
 
