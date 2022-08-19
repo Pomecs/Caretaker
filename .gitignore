@@ -1,6 +1,9 @@
 #Ignores everything
 /*
 
+#Ignores all .DS_Store files
+**/.DS_Store
+
 #But not these
 !.gitignore
 !Assets/
