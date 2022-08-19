@@ -10,17 +10,14 @@ public class TimeManagementSystem : MonoBehaviour
     public static float timer;
     private bool isTimerRunning;
 
-    // Start is called before the first frame update
     void Start()
     {
         isTimerRunning = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("a") && !isTimerRunning)
-        {
+        if (Input.GetKeyDown("a") && !isTimerRunning){ // Erase this line, to trigger setTimerActive() outside this class
             setTimerActive();
         }
 

@@ -25,6 +25,6 @@ public class SecondTimerTest : MonoBehaviour
     }
 
     private void showResult(){
-        timerText.text = "YOU Suck!!!";
+        timerText.text = "YOU SUCK!!!";
     }
 }
