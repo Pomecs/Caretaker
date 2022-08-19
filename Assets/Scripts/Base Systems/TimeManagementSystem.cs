@@ -29,6 +29,7 @@ public class TimeManagementSystem : MonoBehaviour
                 onTimerEnd?.Invoke();
                 setTimerActive();
                 timer = 0;
+                GameManager.nextState();
             }
         }
     }
