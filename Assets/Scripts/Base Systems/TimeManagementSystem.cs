@@ -8,7 +8,7 @@ public class TimeManagementSystem : MonoBehaviour
     public static Action onTimerStart;  
     public static Action onTimerEnd;
     public static float timer;
-    private bool isTimerRunning;
+    public static bool isTimerRunning;
 
     void Start()
     {

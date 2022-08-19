@@ -6,6 +6,12 @@ using TMPro;
 public class SecondTimerTest : MonoBehaviour
 {
     public TextMeshProUGUI timerText;
+    public GameObject gameToPlay;
+    private bool isPlayingGame;
+
+    void Start(){
+        isPlayingGame = false;
+    }
 
     // Subscribes to Action in TimeManagementSystem ( Observer Pattern )
     private void OnEnable(){
@@ -21,6 +27,12 @@ public class SecondTimerTest : MonoBehaviour
     }
 
     private void updateTimer(){
+        if(!isPlayingGame){
+            gameToPlay.SetActive(true);
+            isPlayingGame = true;
+            return;
+        }
+
         timerText.text = $"{TimeManagementSystem.timer:00.00}"; // String literal with format type ie: 90 seconds and not 90.02341...
     }
 
