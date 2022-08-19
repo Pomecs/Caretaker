@@ -1,0 +1,6 @@
+#Ignores everything
+/*
+
+#But not these
+!.gitignore
+!Assets/
