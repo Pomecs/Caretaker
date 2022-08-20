@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public float roundTimeLimit;
     public float timeBtwRequests;
     public int targetRoundScore;
+    public GameObject[] requests;
     public static TextMeshProUGUI timerText;
     public static TextMeshProUGUI scoreText;
     public static TextMeshProUGUI roundText;
@@ -36,11 +37,13 @@ public class GameManager : MonoBehaviour
     private Timer lastBattleTimer;
     private static bool startedFinalBattle;
     private static bool endedFinalBattle;
+    private GameObject requestSpawner;
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
         roundText = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
         finalBattleText = GameObject.Find("FinalBattleText").GetComponent<TextMeshProUGUI>();
+        requestSpawner = GameObject.Find("RequestSpawner");
         finalBattleText.gameObject.SetActive(false);
         currentGameState = gameState.Intro;
         score = 0;
@@ -95,8 +98,31 @@ public class GameManager : MonoBehaviour
         scoreText.text = score.ToString();
     }
 
-    public void sendNewRequest(){
+    public void sendNewRequest(){ // ADD REQUESTS TO QUEUE. ADD CURRENTGAME, CHECK IF BOTH ARE THE SAME.
+        int rand = UnityEngine.Random.Range(0, 100);
+        if(rand > 80){
+            sendDoubleRequest();
+        } else {
+            sendSingleRequest();
+        }
+    }
+
+    private void sendSingleRequest(){ // NEED TO DESTROY OBJECT AFTER 5s, OR STORE IT AND THEN DESTROY IT
         Debug.Log("SEnding a new Request");
+        int rand = UnityEngine.Random.Range(0, requests.Length);
+        Instantiate(requests[rand], requestSpawner.transform.position, Quaternion.identity);
+    }
+
+    private void sendDoubleRequest(){ // NEED TO STORE GAMES PLAYED AND RESET THEM AFTER??? SHIT NEED TO THIK...
+        Debug.Log("Sending a DOUBLE Request");
+        Vector2 pos1 = requestSpawner.transform.position;
+        Vector2 pos2 = requestSpawner.transform.position;
+        pos1.x -= 0.5f;
+        pos2.x += 0.5f;
+        int rand1 = UnityEngine.Random.Range(0, requests.Length);
+        int rand2 = UnityEngine.Random.Range(0, requests.Length);
+        Instantiate(requests[rand1], pos1, Quaternion.identity);
+        Instantiate(requests[rand2], pos2, Quaternion.identity);
     }
 
     public void requestFinalBattle(){
