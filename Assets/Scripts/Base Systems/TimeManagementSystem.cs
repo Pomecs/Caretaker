@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class TimeManagementSystem
+public class TimeManagementSystem : MonoBehaviour
 {
     public Action onTimerStart;  
     public Action onTimerEnd;

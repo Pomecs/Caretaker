@@ -15,6 +15,7 @@ public class EnemyLogic : MonoBehaviour
         if(other.tag == "Player"){
             Destroy(gameObject);
             FinalBattleManager.decreaseTries();
+            return;
         }
 
         if(other.tag == gameObject.tag){
