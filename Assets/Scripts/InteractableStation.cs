@@ -20,8 +20,8 @@ public class InteractableStation : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Space) && inRange && !disabled){
             GameManager.dodgeDisabled = true;
-            gameToPlay?.SetActive(true);
             GameManager.playerMove = false;
+            gameToPlay?.SetActive(true);
             // afterwards, trigger cooldown
             TriggerCooldown();
         }

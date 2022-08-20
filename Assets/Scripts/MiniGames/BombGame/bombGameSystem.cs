@@ -16,12 +16,16 @@ public class bombGameSystem : MonoBehaviour
     private float bombFallSpeed = 90f;
     private float playerSpeed = 50f;
 
-
-    void Awake(){
+    void OnEnable(){
         tookAction = false;
         bombTransform = bombObject.GetComponent<RectTransform>();
         playerTransform = playerObject.GetComponent<RectTransform>();
         bomb = new Bomb(testState);
+        bombTransform.anchoredPosition = new Vector2(-MAX_POSITION, 30);
+    }
+
+    void OnDisable(){
+
     }
 
     // Update is called once per frame
@@ -81,16 +85,20 @@ public class bombGameSystem : MonoBehaviour
         Vector2 position = bombTransform.anchoredPosition;
 
         if(position.y <= -MAX_POSITION){
-            tookAction = false;
-            bomb = new Bomb(testState);
-            position = new Vector2(-MAX_POSITION, 30);
-            bombTransform.anchoredPosition = position;
+            StartCoroutine(endGame());
             return;
         }
 
         position.y -= bombFallSpeed * Time.deltaTime;
 
         bombTransform.anchoredPosition = position;
+    }
+
+    IEnumerator endGame(){
+        Debug.Log("YOU ENDED THE GAME!");
+        yield return new WaitForSeconds(1);
+        gameObject.SetActive(false);
+        GameManager.playerMove = true;
     }
 }
 

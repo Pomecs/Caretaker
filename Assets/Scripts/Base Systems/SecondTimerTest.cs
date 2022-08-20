@@ -15,15 +15,15 @@ public class SecondTimerTest : MonoBehaviour
 
     // Subscribes to Action in TimeManagementSystem ( Observer Pattern )
     private void OnEnable(){
-        TimeManagementSystem.timer = 10f;
-        TimeManagementSystem.onTimerStart += updateTimer;
-        TimeManagementSystem.onTimerEnd += showResult;
+        //TimeManagementSystem.timer = 10f;
+        //TimeManagementSystem.onTimerStart += updateTimer;
+        //TimeManagementSystem.onTimerEnd += showResult;
     }
 
     // Unsubscribes to Action
     private void OnDisable(){
-        TimeManagementSystem.onTimerStart -= updateTimer;
-        TimeManagementSystem.onTimerEnd -= showResult;
+        //TimeManagementSystem.onTimerStart -= updateTimer;
+        //TimeManagementSystem.onTimerEnd -= showResult;
     }
 
     private void updateTimer(){
@@ -33,7 +33,7 @@ public class SecondTimerTest : MonoBehaviour
             return;
         }
 
-        timerText.text = $"{TimeManagementSystem.timer:00.00}"; // String literal with format type ie: 90 seconds and not 90.02341...
+        //timerText.text = $"{TimeManagementSystem.timer:00.00}"; // String literal with format type ie: 90 seconds and not 90.02341...
     }
 
     private void showResult(){
