@@ -14,11 +14,10 @@ public class FinalBattleManager : MonoBehaviour
     {
         currentTarget = targetValue;
         currentTries = maxTries;
-        GameManager.setFinalBattleStart();
     }
 
     void OnDisable(){
-        GameManager.setFinalBattleEnd();
+
     }
     
     void Update()

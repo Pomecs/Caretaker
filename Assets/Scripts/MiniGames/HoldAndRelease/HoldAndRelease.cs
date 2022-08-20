@@ -36,19 +36,20 @@ public class HoldAndRelease : MonoBehaviour
         }
 
         if(Input.GetKeyUp(KeyCode.DownArrow)){
-            Debug.Log("finished!");
             pressed = false;
+
             if(ob.WithinRange(bar.value)){
-                // increase score
-                GameManager.increaseScore(10);
-                Debug.Log("Good job!");
-                
+                if(GameManager.currentGameState != GameManager.gameState.Intro){
+                    GameManager.increaseScore(10);
+                }    
             }
+
             gameObject.SetActive(false);
             GameManager.playerMove = true;
+
+            if(GameManager.currentGameState == GameManager.gameState.Intro){
+                GameManager.setRoundFinished(true);
+            }
         }
-
-        
    }
-
 }
