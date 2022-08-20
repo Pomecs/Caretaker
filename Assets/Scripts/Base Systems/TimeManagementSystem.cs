@@ -3,38 +3,60 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class TimeManagementSystem : MonoBehaviour
+public class TimeManagementSystem
 {
-    public static Action onTimerStart;  
-    public static Action onTimerEnd;
-    public static float timer;
-    public static bool isTimerRunning;
+    public Action onTimerStart;  
+    public Action onTimerEnd;
+    private float startTimer;
+    private float timer;
+    private bool loop;
+    private bool timerRunning;
+    private bool timerFinished;
 
-    void Start()
-    {
-        isTimerRunning = false;
+    public TimeManagementSystem(float timer, bool loop){
+        startTimer = timer;
+        this.timer = startTimer;
+        this.loop = loop;
+        timerRunning = false;
+        timerFinished = false;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown("a") && !isTimerRunning){ // Erase this line, to trigger setTimerActive() outside this class
-            setTimerActive();
-        }
-
-        if(isTimerRunning){
+        if(timerRunning){
             onTimerStart?.Invoke(); // Checks if onTimerStart is not null and then invoke it.
+            Debug.Log("Firing an event on timer");
             timer -= Time.deltaTime;
 
             if(timer <= 0){
+                if(!loop){
+                    setTimerActive();
+                    timerFinished = true;
+                }
+
                 onTimerEnd?.Invoke();
-                setTimerActive();
-                timer = 0;
-                GameManager.nextState();
+                timer = startTimer;
             }
         }
     }
 
-    void setTimerActive(){
-        isTimerRunning = !isTimerRunning;
+    public float getTimer(){
+        return timer;
+    }
+
+    public bool isTimerFinished(){
+        return timerFinished;
+    }
+
+    public void setTimer(float value){
+        timer = value;
+    }
+
+    public void setTimerActive(){
+        timerRunning = !timerRunning;
+    }
+
+    public bool isTimerRunning(){
+        return timerRunning;
     }
 }
