@@ -4,33 +4,42 @@ using UnityEngine;
 
 public class FinalBattleManager : MonoBehaviour
 {
+    public float animationTime;
     public int maxTries;
     public int targetValue;
+    public GameObject[] livesObjects;
     public static int currentTarget;
     public static int currentTries;
     private static int score;
+    public static bool running;
 
     void OnEnable()
     {
+        running = true;
         currentTarget = targetValue;
         currentTries = maxTries;
+        GameManager.startedFinalBattle = true;
     }
 
     void OnDisable(){
-
+        GameManager.setState(GameManager.gameState.Reset);
     }
     
     void Update()
     {
         if(currentTries <= 0){ // lose
-            gameObject.SetActive(false);
-            GameManager.playerMove = true;
+            livesObjects[0]?.SetActive(false);
+            StartCoroutine(endGame());
+            return;
+        }
+
+        if(currentTries < maxTries){
+            livesObjects[currentTries]?.SetActive(false);
         }
 
         if(currentTarget <= 0){ // win
             GameManager.increaseScore(score);
-            gameObject.SetActive(false);
-            GameManager.playerMove = true;
+            StartCoroutine(endGame());
         }
     }
 
@@ -48,5 +57,12 @@ public class FinalBattleManager : MonoBehaviour
 
     public static void increaseScore(){
         score += 10;
+    }
+
+    IEnumerator endGame(){
+        running = false;
+        yield return new WaitForSeconds(animationTime);
+        gameObject.SetActive(false);
+        GameManager.playerMove = true;
     }
 }

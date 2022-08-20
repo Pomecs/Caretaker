@@ -9,14 +9,17 @@ public class GameManager : MonoBehaviour
 {
     public float roundTimeLimit;
     public float timeBtwRequests;
+    public float lastBattleAnimTime;
+    public float timeToLastBattle;
     public int targetRoundScore;
+    public InteractableStation[] stations; // testing
     public InteractableStation holdStation;
     public InteractableStation bombStation;
     public InteractableStation sequenceStation;
     public InteractableStation finalStation;
     public GameObject finalBattleRequest;
     public GameObject[] requests;
-    private GameObject[] currentRequests;
+    private GameObject currentRequest;
     public static TextMeshProUGUI timerText;
     public static TextMeshProUGUI scoreText;
     public static TextMeshProUGUI roundText;
@@ -28,11 +31,12 @@ public class GameManager : MonoBehaviour
         RoundTwo,
         RoundThree,
         FinalBattle,
-        EndGame
+        EndGame,
+        Reset
     }
 
     public static gameState currentGameState;
-    private gameState lastGameState;
+    private static gameState lastGameState;
 
     // change to static methods
     public static bool dodgeDisabled = false;
@@ -45,6 +49,7 @@ public class GameManager : MonoBehaviour
     private Timer lastBattleTimer;
     private GameObject requestSpawner;
     private static bool isRoundFinished;
+    public static bool startedFinalBattle;
 
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
@@ -58,35 +63,34 @@ public class GameManager : MonoBehaviour
         score = 0;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
-        lastBattleTimer = new Timer(timeBtwRequests, false);
         isRoundFinished = false;
+        startedFinalBattle = false;
     }
 
     void Start()
     {
-        timerText.text = $"{roundTimer.getTimer():00.00}";
+        timerText.text = $"{roundTimer.getTimer():00}";
         updateScoreText();
         updateTimerText();
         updateRoundText();
-        subscribeTimers();
     }
 
     void Update()
     {
-        if(isRoundFinished){
+        if(isRoundFinished){ // changed in resetRound
             currentGameState = lastGameState;
             nextState();
-            subscribeTimers();
             updateRoundText();
             updateScoreText();
             updateTimerText();
+            updateStations();
             isRoundFinished = false;
             StartCoroutine(startRound());
         }
 
         switch(currentGameState){
             case gameState.Intro:
-
+                updateStations();
             break;
             case gameState.RoundOne:
                 timersUpdate();
@@ -97,18 +101,20 @@ public class GameManager : MonoBehaviour
             case gameState.RoundThree:
                 timersUpdate();
             break;
-            case gameState.FinalBattle:
-                timersUpdate();
+            case gameState.FinalBattle: // FIX FINAL BATTLE STATE!!!!
+                timersUpdate(); 
             break;
             case gameState.EndGame:
 
             break;
+            case gameState.Reset:
+                resetRound();
+            break;
         }
-
-        updateStations();
     }
 
     IEnumerator startRound(){
+        subscribeTimers();
         finalBattleText.text = $"{currentGameState} is about to start!";
         finalBattleText.gameObject.SetActive(true);
         yield return new WaitForSeconds(2);
@@ -118,14 +124,23 @@ public class GameManager : MonoBehaviour
         sendNewRequest();
     }
 
-    private void checkActiveStation(){
+    private bool checkActiveStation(){ // Use to check if player is using right station???
+        bool result = false;
 
+        foreach(InteractableStation station in stations){
+            if(station.requestObject == currentRequest) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
     private void timersUpdate(){
         roundTimer.update();
         requestTimer.update();
-        lastBattleTimer.update();
+        lastBattleTimer?.update();
     }
 
     public void updateStations(){
@@ -173,74 +188,52 @@ public class GameManager : MonoBehaviour
         scoreText.text = score.ToString();
     }
 
-    public void sendNewRequest(){ // ADD REQUESTS TO QUEUE. ADD CURRENTGAME, CHECK IF BOTH ARE THE SAME.
-        destroyRequests();
-        int rand = UnityEngine.Random.Range(0, 100);
-        if(rand > 80){
-            sendDoubleRequest();
-        } else {
-            sendSingleRequest();
-        }
-    }
+    public void sendNewRequest(){
+        currentRequest?.SetActive(false);
 
-    private void destroyRequests(){
-        foreach(GameObject request in requests){
-            DestroyImmediate(request, true);
-        }
-    }
-
-    private void sendSingleRequest(){ // NEED TO DESTROY OBJECT AFTER 5s, OR STORE IT AND THEN DESTROY IT
-        Debug.Log("SEnding a new Request");
         int rand = UnityEngine.Random.Range(0, requests.Length);
-        currentRequests.SetValue(PrefabUtility.InstantiatePrefab(requests[rand] as GameObject), 0);
-    }
-
-    private void sendDoubleRequest(){ // NEED TO STORE GAMES PLAYED AND RESET THEM AFTER??? SHIT NEED TO THIK...
-        Debug.Log("Sending a DOUBLE Request");
-        Vector2 pos1 = requestSpawner.transform.position;
-        Vector2 pos2 = requestSpawner.transform.position;
-        pos1.x -= 2f;
-        pos2.x += 2f;
-        int rand1 = UnityEngine.Random.Range(0, requests.Length);
-        int rand2 = UnityEngine.Random.Range(0, requests.Length);
-        currentRequests.SetValue(Instantiate(requests[rand1], pos1, Quaternion.identity), 0);
-        currentRequests.SetValue(Instantiate(requests[rand2], pos2, Quaternion.identity), 1);
+        currentRequest = requests[rand];
+        currentRequest.SetActive(true);
     }
 
     public void requestFinalBattle(){
-        Debug.Log("RUN TO THE LAST BATTLE!!");
-        currentRequests.SetValue(Instantiate(finalBattleRequest, requestSpawner.transform.position, Quaternion.identity), 0);
+        currentRequest?.SetActive(false);
+        currentRequest = finalBattleRequest;
+        currentRequest.SetActive(true);
     }
 
     public void updateTimerText(){
         if(roundTimer.isTimerRunning()){
-            timerText.text = $"{roundTimer.getTimer():00.00}";   
+            timerText.text = $"{roundTimer.getTimer():00}";
+            return;   
         }
-        if(lastBattleTimer.isTimerRunning()){
-            timerText.text = $"{lastBattleTimer.getTimer():00.00}";
+
+        if(lastBattleTimer != null){
+            timerText.text = $"{lastBattleTimer.getTimer():00}"; 
         }
-        
     }
 
     public void updateRoundText(){
         roundText.text = currentGameState.ToString();
     }
 
-    public void resetRound(){//round ends, check for score and show if game is won
+    public void resetRound(){
         checkScore();
-        currentRequests = new GameObject[2];
-        finalScore += score;
+        currentRequest.SetActive(false);
+        currentRequest = null;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
         score = 0;
+        currentGameState = lastGameState;
         isRoundFinished = true;
     }
 
     public void checkScore(){
-        if(score < targetRoundScore){
+        if(score < targetRoundScore){ // If round is lost, dont save score!
             Debug.Log("YOU LOST THE ROUND!!!!");
         } else {
             Debug.Log("YOU WON THE ROUND!!!!");
+            finalScore += score;
         }
     }
 
@@ -250,13 +243,16 @@ public class GameManager : MonoBehaviour
         roundTimer.onTimerEnd += setupFinalBattle;
     }
 
-    public void checkFinalEncounter(){ // NOT WORKING!!!!!!!! ITS ASYNCH!!!
-        // disable final battle station
-        Debug.Log("SHOULDNT BE RESETTING!!!!");
+    public void checkFinalEncounter(){
+        if(startedFinalBattle){
+            return;
+        }
+        
         resetRound();
     }
 
-    public void setupFinalBattle(){
+    void setupFinalBattle(){
+        lastBattleTimer = new Timer(timeToLastBattle, false);
         lastBattleTimer.onTimerStart += updateTimerText;
         lastBattleTimer.onTimerEnd += checkFinalEncounter;
         finalBattleText.text = "FINAL BATTLE!";
@@ -266,11 +262,13 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator startFinalBattle(){
         lastGameState = currentGameState;
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(lastBattleAnimTime);
+
         currentGameState = gameState.FinalBattle;
         finalBattleText.gameObject.SetActive(false);
         lastBattleTimer.setTimerActive(); // starting
         requestTimer.setTimerActive(); // turning it off
+
         requestFinalBattle();
     }
 

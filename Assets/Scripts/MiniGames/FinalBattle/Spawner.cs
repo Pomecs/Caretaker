@@ -9,7 +9,7 @@ public class Spawner : MonoBehaviour
     private float timeBtwSpawn;
     void Update()
     {
-        if(timeBtwSpawn <= 0){
+        if(timeBtwSpawn <= 0 && FinalBattleManager.running){
             int randomEnemy = Random.Range(0, enemies.Length);
             GameObject enemy = Instantiate(enemies[randomEnemy], transform.position, Quaternion.identity);
             enemy.transform.SetParent(GameObject.Find("FinalBattle").transform);

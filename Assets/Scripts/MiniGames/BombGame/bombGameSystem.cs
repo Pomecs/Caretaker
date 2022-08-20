@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class bombGameSystem : MonoBehaviour
 {
-    public int MAX_POSITION = 47;
+    public float animationTime;
+    public int MAX_POSITION;
     public GameObject bombObject;
     public GameObject playerObject;
+    public GameObject enemyObject;
     private RectTransform bombTransform;
     private RectTransform playerTransform;
+    private RectTransform enemyTransform;
     private Bomb bomb;
     private bool tookAction;
+    private bool gameFinished;
     private int bombSpeed = 1;
     private float bombFallSpeed = 90f;
     private float playerSpeed = 50f;
@@ -19,8 +23,12 @@ public class bombGameSystem : MonoBehaviour
         tookAction = false;
         bombTransform = bombObject.GetComponent<RectTransform>();
         playerTransform = playerObject.GetComponent<RectTransform>();
+        enemyTransform = enemyObject.GetComponent<RectTransform>();
         bomb = new Bomb();
         bombTransform.anchoredPosition = new Vector2(-MAX_POSITION, 30);
+        playerTransform.anchoredPosition = new Vector2(-MAX_POSITION, 30);
+        enemyTransform.anchoredPosition = new Vector2(0, -22);
+        gameFinished = false;
     }
 
     void OnDisable(){
@@ -30,6 +38,8 @@ public class bombGameSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(gameFinished) return;
+
         if (Input.GetKeyDown("space") && !tookAction){
             tookAction = true;
         }
@@ -43,11 +53,13 @@ public class bombGameSystem : MonoBehaviour
 
     void moveBomb(){
         Vector2 bombPosition = bombTransform.anchoredPosition;
+        Vector2 playerPosition = playerTransform.anchoredPosition;
  
         switch(GameManager.currentGameState){
             case GameManager.gameState.RoundOne:
                 if(bombPosition.x >= MAX_POSITION){
                     bombPosition = new Vector2(-MAX_POSITION, 30);
+                    playerPosition = new Vector2(-MAX_POSITION, 30);
                     bomb = new Bomb();
                 }
                 break;
@@ -57,16 +69,16 @@ public class bombGameSystem : MonoBehaviour
                 }
                 break;
             case GameManager.gameState.RoundThree:
-                Vector2 playerPosition = playerTransform.anchoredPosition;
+                Vector2 enemyPosition = enemyTransform.anchoredPosition;
 
                 if(bombPosition.x >= MAX_POSITION || bombPosition.x < -MAX_POSITION){
                     bombSpeed = -bombSpeed;
                 }
-                if(playerPosition.x >= MAX_POSITION || playerPosition.x < -MAX_POSITION){
+                if(enemyPosition.x >= MAX_POSITION || enemyPosition.x < -MAX_POSITION){
                     playerSpeed = -playerSpeed;
                 }
-                playerPosition.x += playerSpeed * Time.deltaTime;
-                playerTransform.anchoredPosition = playerPosition;
+                enemyPosition.x += playerSpeed * Time.deltaTime;
+                enemyTransform.anchoredPosition = enemyPosition;
                 break;
             default:
                 if(bombPosition.x >= MAX_POSITION || bombPosition.x < -MAX_POSITION){
@@ -75,8 +87,9 @@ public class bombGameSystem : MonoBehaviour
                 break;
         }
 
+        playerPosition.x += bomb.getSpeed() * bombSpeed * Time.deltaTime;
+        playerTransform.anchoredPosition = playerPosition;
         bombPosition.x += bomb.getSpeed() * bombSpeed * Time.deltaTime;
-
         bombTransform.anchoredPosition = bombPosition;
     }
 
@@ -85,6 +98,7 @@ public class bombGameSystem : MonoBehaviour
 
         if(position.y <= -MAX_POSITION){
             StartCoroutine(endGame()); // IF we want to make a super small bomb animation before destroying the object
+            gameFinished = true;
             return;
         }
 
@@ -94,8 +108,7 @@ public class bombGameSystem : MonoBehaviour
     }
 
     IEnumerator endGame(){
-        Debug.Log("YOU ENDED THE GAME!");
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(animationTime);
         gameObject.SetActive(false);
         GameManager.playerMove = true;
     }

@@ -8,6 +8,7 @@ public class InteractableStation : MonoBehaviour
     private bool inRange = false;
     public int cooldown;
     public GameObject gameToPlay;
+    public GameObject requestObject;
     private bool disabled = false;
     private bool isActive = false;
     private SpriteRenderer spriteRenderer;
@@ -35,7 +36,7 @@ public class InteractableStation : MonoBehaviour
         if(value){
             spriteRenderer.color = Color.red;
         } else {
-            spriteRenderer.color = Color.yellow;
+            spriteRenderer.color = Color.white;
         }
         
     }
@@ -49,8 +50,6 @@ public class InteractableStation : MonoBehaviour
         yield return new WaitForSeconds(secs);
         setDisabled(false);
         isActive = false;
-        // remove this later, this is just here for testing!
-        //gameToPlay.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
