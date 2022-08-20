@@ -12,7 +12,7 @@ public class Spawner : MonoBehaviour
         if(timeBtwSpawn <= 0){
             int randomEnemy = Random.Range(0, enemies.Length);
             GameObject enemy = Instantiate(enemies[randomEnemy], transform.position, Quaternion.identity);
-            enemy.transform.parent = GameObject.Find("FinalBattle").transform;
+            enemy.transform.SetParent(GameObject.Find("FinalBattle").transform);
             timeBtwSpawn = startTimeBtwSpawns;
         } else {
             timeBtwSpawn -= Time.deltaTime;

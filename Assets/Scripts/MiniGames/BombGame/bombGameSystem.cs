@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class bombGameSystem : MonoBehaviour
 {
-    public int testState = 0;
     public int MAX_POSITION = 47;
     public GameObject bombObject;
     public GameObject playerObject;
@@ -20,7 +19,7 @@ public class bombGameSystem : MonoBehaviour
         tookAction = false;
         bombTransform = bombObject.GetComponent<RectTransform>();
         playerTransform = playerObject.GetComponent<RectTransform>();
-        bomb = new Bomb(testState);
+        bomb = new Bomb();
         bombTransform.anchoredPosition = new Vector2(-MAX_POSITION, 30);
     }
 
@@ -45,19 +44,19 @@ public class bombGameSystem : MonoBehaviour
     void moveBomb(){
         Vector2 bombPosition = bombTransform.anchoredPosition;
  
-        switch(testState){
-            case 0:
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundOne:
                 if(bombPosition.x >= MAX_POSITION){
                     bombPosition = new Vector2(-MAX_POSITION, 30);
-                    bomb = new Bomb(testState);
+                    bomb = new Bomb();
                 }
                 break;
-            case 1:
+            case GameManager.gameState.RoundTwo:
                 if(bombPosition.x >= MAX_POSITION || bombPosition.x < -MAX_POSITION){
                     bombSpeed = -bombSpeed;
                 }
                 break;
-            case 2:
+            case GameManager.gameState.RoundThree:
                 Vector2 playerPosition = playerTransform.anchoredPosition;
 
                 if(bombPosition.x >= MAX_POSITION || bombPosition.x < -MAX_POSITION){
@@ -85,7 +84,7 @@ public class bombGameSystem : MonoBehaviour
         Vector2 position = bombTransform.anchoredPosition;
 
         if(position.y <= -MAX_POSITION){
-            StartCoroutine(endGame());
+            StartCoroutine(endGame()); // IF we want to make a super small bomb animation before destroying the object
             return;
         }
 
@@ -104,15 +103,15 @@ public class bombGameSystem : MonoBehaviour
 
 class Bomb{
     private float speed;
-    public Bomb(int state){
-        switch(state){
-            case 0:
+    public Bomb(){
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundOne:
                 speed = Random.Range(40f, 80f);
                 break;
-            case 1:
+            case GameManager.gameState.RoundTwo:
                 speed = Random.Range(80f, 120f);
                 break;
-            case 2:
+            case GameManager.gameState.RoundThree:
                 speed = Random.Range(120f, 200f);
                 break;
             default:

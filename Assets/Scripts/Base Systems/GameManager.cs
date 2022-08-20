@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public static TextMeshProUGUI timerText;
     public static TextMeshProUGUI scoreText;
     public static TextMeshProUGUI roundText;
+    public static TextMeshProUGUI finalBattleText;
 
     public enum gameState{
         Intro,
@@ -32,18 +33,27 @@ public class GameManager : MonoBehaviour
     private int finalScore = 0;
     private Timer roundTimer;
     private Timer requestTimer;
+    private Timer lastBattleTimer;
+    private static bool startedFinalBattle;
+    private static bool endedFinalBattle;
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
         roundText = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
+        finalBattleText = GameObject.Find("FinalBattleText").GetComponent<TextMeshProUGUI>();
+        finalBattleText.gameObject.SetActive(false);
         currentGameState = gameState.Intro;
         score = 0;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
+        lastBattleTimer = new Timer(timeBtwRequests, false);
+        startedFinalBattle = false;
+        endedFinalBattle = false;
     }
 
     void Start()
     {
+        //timerText.text = $"{roundTimer.getTimer():00.00}";
         updateScoreText();
         updateTimerText();
         updateRoundText();
@@ -54,11 +64,16 @@ public class GameManager : MonoBehaviour
     {
         roundTimer.update();
         requestTimer.update();
+        lastBattleTimer.update();
 
         if (Input.GetKeyDown("m")){
             roundTimer.setTimerActive();
             requestTimer.setTimerActive();
             sendNewRequest();
+        }
+
+        if(endedFinalBattle){
+            //resetRound();
         }
     }
 
@@ -76,10 +91,6 @@ public class GameManager : MonoBehaviour
         updateScoreText();
     }
 
-    public static int getScore(){
-        return score;
-    }
-
     private static void updateScoreText(){
         scoreText.text = score.ToString();
     }
@@ -88,20 +99,32 @@ public class GameManager : MonoBehaviour
         Debug.Log("SEnding a new Request");
     }
 
+    public void requestFinalBattle(){
+        Debug.Log("RUN TO THE LAST BATTLE!!");
+    }
+
     public void updateTimerText(){
-        timerText.text = $"{roundTimer.getTimer():00.00}";
+        if(roundTimer.isTimerRunning()){
+            timerText.text = $"{roundTimer.getTimer():00.00}";   
+        }
+        if(lastBattleTimer.isTimerRunning()){
+            timerText.text = $"{lastBattleTimer.getTimer():00.00}";
+        }
+        
     }
 
     public void updateRoundText(){
         roundText.text = currentGameState.ToString();
     }
 
-    private void resetRound(){//round ends, check for score and show if game is won
+    public void resetRound(){//round ends, check for score and show if game is won
         checkScore();
         finalScore += score;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
         score = 0;
+        //setFinalBattleEnd();
+        //setFinalBattleStart();
         nextState();
         subscribeTimers();
         updateRoundText();
@@ -109,7 +132,7 @@ public class GameManager : MonoBehaviour
         updateTimerText();
     }
 
-    private void checkScore(){
+    public void checkScore(){
         if(score < targetRoundScore){
             Debug.Log("YOU LOST THE ROUND!!!!");
         } else {
@@ -117,10 +140,48 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void subscribeTimers(){
+    public void subscribeTimers(){
         requestTimer.onTimerEnd += sendNewRequest;
         roundTimer.onTimerStart += updateTimerText;
-        roundTimer.onTimerEnd += resetRound;
+        roundTimer.onTimerEnd += setupFinalBattle;
+    }
+
+    public void checkFinalEncounter(){ // NOT WORKING!!!!!!!! ITS ASYNCH!!!
+        if(!getFinalBattleStart()){
+            // disable final battle station
+            Debug.Log("SHOULDNT BE RESETTING!!!!");
+            resetRound();
+            return;
+        }
+
+    }
+
+    public void setupFinalBattle(){
+        lastBattleTimer.onTimerStart += updateTimerText;
+        lastBattleTimer.onTimerEnd += checkFinalEncounter;
+        finalBattleText.text = "FINAL BATTLE!";
+        finalBattleText.gameObject.SetActive(true);
+        StartCoroutine(startFinalBattle());
+    }
+
+    public IEnumerator startFinalBattle(){
+        yield return new WaitForSeconds(2);
+        finalBattleText.gameObject.SetActive(false);
+        lastBattleTimer.setTimerActive(); // starting
+        requestTimer.setTimerActive(); // turning it off
+        requestFinalBattle();
+    }
+
+    private bool getFinalBattleStart(){
+        return startedFinalBattle;
+    }
+
+    public static void setFinalBattleStart(){
+        startedFinalBattle = !startedFinalBattle;
+    }
+
+    public static void setFinalBattleEnd(){
+        endedFinalBattle= !endedFinalBattle;
     }
 }
 
