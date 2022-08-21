@@ -81,14 +81,13 @@ public class GameManager : MonoBehaviour
             updateRoundText();
             updateScoreText();
             updateTimerText();
-            updateStations();
             isRoundFinished = false;
             StartCoroutine(startRound());
         }
 
         switch(currentGameState){
             case gameState.Intro:
-                updateStations();
+
             break;
             case gameState.RoundOne:
                 timersUpdate();
@@ -100,7 +99,7 @@ public class GameManager : MonoBehaviour
                 timersUpdate();
             break;
             case gameState.FinalBattle: // FIX FINAL BATTLE STATE!!!!
-                timersUpdate(); 
+                timersUpdate();
             break;
             case gameState.EndGame:
 
@@ -109,6 +108,7 @@ public class GameManager : MonoBehaviour
                 resetRound();
             break;
         }
+        updateStations();
     }
 
     IEnumerator startRound(){
