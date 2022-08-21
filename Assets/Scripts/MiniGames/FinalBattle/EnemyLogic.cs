@@ -4,23 +4,26 @@ using UnityEngine;
 
 public class EnemyLogic : MonoBehaviour
 {
-    public float speed;
-    void Update()
+    private float speed;
+
+    void FixedUpdate()
     {
-        switch(GameManager.currentGameState){
-            case GameManager.gameState.RoundOne:
-                transform.Translate(Vector2.left * speed * Time.deltaTime);
-            break;
+        switch(GameManager.lastGameState){
             case GameManager.gameState.RoundTwo:
-                transform.Translate(Vector2.left * speed * 1.5f * Time.deltaTime);
+                speed = 150;
             break;
             case GameManager.gameState.RoundThree:
-                transform.Translate(Vector2.left * speed * 2 * Time.deltaTime);
+                speed = 200;
+            break;
+            case GameManager.gameState.FinalBattle:
+                speed = 250;
             break;
             default:
-                transform.Translate(Vector2.left * speed * 1.5f * Time.deltaTime);
+                speed = 100;
             break;
         }
+
+        transform.Translate(Vector2.left * speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other){

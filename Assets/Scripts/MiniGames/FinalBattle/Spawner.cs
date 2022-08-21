@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public float startTimeBtwSpawns;
+    private float startTimeBtwSpawns;
     public GameObject[] enemies;
     private float timeBtwSpawn;
     private static List<GameObject> enemiesSpawned = new List<GameObject>();
+
+    void OnEnable(){
+        checkState();
+    }
 
     void Update()
     {
@@ -20,6 +24,27 @@ public class Spawner : MonoBehaviour
         } else {
             timeBtwSpawn -= Time.deltaTime;
         }
+    }
+
+    void checkState(){
+        switch(GameManager.lastGameState){
+            case GameManager.gameState.RoundOne:
+                startTimeBtwSpawns = 1.2f;
+            break;
+            case GameManager.gameState.RoundTwo:
+                startTimeBtwSpawns = 1;
+            break;
+            case GameManager.gameState.RoundThree:
+                startTimeBtwSpawns = 0.75f;
+            break;
+            case GameManager.gameState.FinalBattle:
+                 startTimeBtwSpawns = 0.5f;
+            break;
+            default:
+                startTimeBtwSpawns = 1;
+            break;
+        }
+        timeBtwSpawn = startTimeBtwSpawns;
     }
 
     public static void removeEnemy(GameObject enemy){

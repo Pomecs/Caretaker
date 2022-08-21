@@ -15,21 +15,17 @@ public class FinalBattleManager : MonoBehaviour
 
     void OnEnable()
     {
+        score = 0;
         running = true;
-        setTries();
+        setTarget();
         GameManager.startedFinalBattle = true;
-        setUpGame();
+        maxTries = 5;
+        currentTries = maxTries;
     }
 
     void OnDisable(){
         GameManager.setState(GameManager.gameState.Reset);
         resetGame();
-    }
-
-    void setUpGame(){
-        for(int i = 0; i < maxTries; i++){
-            livesObjects[i].SetActive(true);
-        }
     }
 
     void resetGame(){
@@ -53,31 +49,27 @@ public class FinalBattleManager : MonoBehaviour
 
         if(currentTarget <= 0 && running){ // win
             running = false;
+            GameManager.increaseScore(score);
             StartCoroutine(endGame());
         }
     }
 
-    void setTries(){
-        switch(GameManager.currentGameState){
+    void setTarget(){
+        switch(GameManager.lastGameState){
             case GameManager.gameState.RoundOne:
-                maxTries = 5;
                 targetValue = 15;
             break;
             case GameManager.gameState.RoundTwo:
-                maxTries = 4;
                 targetValue = 20;
             break;
             case GameManager.gameState.RoundThree:
-                maxTries = 3;
                 targetValue = 25;
             break;
             default:
-                maxTries = 5;
-                targetValue = 15;
+                targetValue = 20; // also works with final battle stage
             break;
         }
         currentTarget = targetValue;
-        currentTries = maxTries;
     }
 
     public static int getTries(){
@@ -97,7 +89,6 @@ public class FinalBattleManager : MonoBehaviour
     }
 
     IEnumerator endGame(){
-        GameManager.increaseScore(score);
         yield return new WaitForSeconds(animationTime);
         gameObject.SetActive(false);
         GameManager.playerMove = true;
