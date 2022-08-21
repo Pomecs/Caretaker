@@ -13,19 +13,19 @@ public class EnemyLogic : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other){
 
         if(other.tag == "Player"){
-            Destroy(gameObject);
+            Spawner.removeEnemy(gameObject);
             FinalBattleManager.decreaseTries();
             return;
         }
 
-        if(other.tag == gameObject.tag){
+        if(other.tag == gameObject.tag){ // other is player projectile
+            Spawner.removeEnemy(gameObject);
             Destroy(other.gameObject);
-            Destroy(gameObject);
             FinalBattleManager.increaseScore();
             FinalBattleManager.hitTarget();
         } else {
+            Spawner.removeEnemy(gameObject);
             Destroy(other.gameObject);
-            Destroy(gameObject);
             FinalBattleManager.decreaseTries();
         }
     }

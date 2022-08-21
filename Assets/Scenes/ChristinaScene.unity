@@ -3999,12 +3999,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dde2021def0b4c48b95109f1c7ee364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roundTimeLimit: 45
+  roundTimeLimit: 10
   timeBtwRequests: 5
   lastBattleAnimTime: 2
   timeToLastBattle: 3
   targetRoundScore: 100
-  stations: []
   holdStation: {fileID: 6440595443409899091}
   bombStation: {fileID: 6440595444518335544}
   sequenceStation: {fileID: 6440595443564865464}

@@ -23,6 +23,14 @@ public class FinalBattleManager : MonoBehaviour
 
     void OnDisable(){
         GameManager.setState(GameManager.gameState.Reset);
+        resetGame();
+    }
+
+    void resetGame(){
+        foreach(GameObject live in livesObjects){
+            live.SetActive(true);
+        }
+        Spawner.removeAllEnemies();
     }
     
     void Update()
