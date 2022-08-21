@@ -8,10 +8,10 @@ public class PlayerLogic : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown("up")){
+        if (Input.GetKeyDown("left")){
             GameObject projectile = Instantiate(projectiles[0], transform.position, Quaternion.identity);
             projectile.transform.SetParent(GameObject.Find("FinalBattle").transform);
-        } else if(Input.GetKeyDown("left")){
+        } else if(Input.GetKeyDown("up")){
             GameObject projectile = Instantiate(projectiles[1], transform.position, Quaternion.identity);
             projectile.transform.SetParent(GameObject.Find("FinalBattle").transform);
         } else if(Input.GetKeyDown("right")){

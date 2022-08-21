@@ -8,6 +8,7 @@ public class InteractableStation : MonoBehaviour
     private bool inRange = false;
     public int cooldown;
     public GameObject gameToPlay;
+    public GameObject requestObject;
     private bool disabled = false;
     private SpriteRenderer spriteRenderer;
     
@@ -19,6 +20,7 @@ public class InteractableStation : MonoBehaviour
     public void Update() {
 
         if(Input.GetKeyDown(KeyCode.Space) && inRange && !disabled){
+            GameManager.isPlayerAtRightStation = GameObject.ReferenceEquals( GameManager.currentRequest, requestObject);
             GameManager.dodgeDisabled = true;
             GameManager.playerMove = false;
             gameToPlay?.SetActive(true);
@@ -28,18 +30,24 @@ public class InteractableStation : MonoBehaviour
         
     }
 
+    public void setDisabled(bool value){
+        disabled = value;
+        if(value){
+            spriteRenderer.color = Color.red;
+        } else {
+            spriteRenderer.color = Color.white;
+        }
+        
+    }
+
     public void TriggerCooldown(){
-        spriteRenderer.color = Color.red;
-        disabled = true;
+        setDisabled(true);
         StartCoroutine(StopCooldown(cooldown));
     }
 
     private IEnumerator StopCooldown(int secs){
         yield return new WaitForSeconds(secs);
-        spriteRenderer.color = Color.yellow;
-        disabled = false;
-        // remove this later, this is just here for testing!
-        //gameToPlay.SetActive(false);
+        setDisabled(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other) {

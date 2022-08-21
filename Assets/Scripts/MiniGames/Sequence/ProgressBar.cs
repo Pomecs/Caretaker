@@ -39,7 +39,10 @@ public class ProgressBar : MonoBehaviour
         } 
 
         if(bar.value == maxBar){
-            GameManager.increaseScore(10);
+            if(GameManager.isPlayerAtRightStation){
+                GameManager.increaseScore(10);
+            }
+
             FindObjectOfType<SequenceGame>().Disable();
         }
 
