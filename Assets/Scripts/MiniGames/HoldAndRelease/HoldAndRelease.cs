@@ -13,32 +13,17 @@ public class HoldAndRelease : MonoBehaviour
     private bool pressed;
 
     public GameObject gameOb;
+    public GameObject bossOb;
     private ObjectiveBox ob;
     
     private void OnEnable(){
         bar = GetComponentInChildren<Slider>();
         ob = gameOb.GetComponent<ObjectiveBox>();
+        gameObject.SetActive(true);
+        
         currentBar = maxBar;
         bar.maxValue = maxBar;
         bar.value = 0;
-        setUpSpeed();
-    }
-
-    void setUpSpeed(){
-        switch(GameManager.currentGameState){
-            case GameManager.gameState.RoundTwo:
-                speed = Random.Range(0.2f, 0.4f);
-            break;
-            case GameManager.gameState.RoundThree:
-                speed = Random.Range(0.9f, 1.1f);
-            break;
-            case GameManager.gameState.FinalBattle:
-                speed = Random.Range(0.6f, 0.8f);
-            break;
-            default:
-                speed = 0.4f;
-            break;
-        }
     }
 
 
