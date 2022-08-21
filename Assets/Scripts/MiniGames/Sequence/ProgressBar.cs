@@ -7,34 +7,21 @@ public class ProgressBar : MonoBehaviour
 {
 
     private Slider bar;
-    public float speed;
+    private float speed;
     private int maxBar = 100;
     private int currentBar;
-    // Start is called before the first frame update
-    void Start()
-    {
-        bar = GetComponent<Slider>();
-        currentBar = maxBar;
-        bar.maxValue = maxBar;
-        bar.value = 50;
-
-    }
     
-
     private void OnEnable(){
-        
         bar = GetComponent<Slider>();
         currentBar = maxBar;
         bar.maxValue = maxBar;
         bar.value = 50;
+        setSpeed();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(bar.value == 0){
-            Debug.Log("YOU LOSE");
-            // close
             FindObjectOfType<SequenceGame>().Disable();
         } 
 
@@ -49,7 +36,31 @@ public class ProgressBar : MonoBehaviour
         bar.value -= Time.deltaTime * speed;
     }
 
+    void setSpeed(){
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundTwo:
+                speed = Random.Range(6, 9);
+            break;
+            case GameManager.gameState.RoundThree:
+                speed = Random.Range(10, 14);
+            break;
+            default:
+                speed = Random.Range(4, 6);
+            break;
+        }
+    }
+
     public void IncreaseValue(){
-        bar.value += 5;
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundTwo:
+                bar.value += Random.Range(3, 5);
+            break;
+            case GameManager.gameState.RoundThree:
+                bar.value += Random.Range(2, 4);
+            break;
+            default:
+                bar.value += Random.Range(4, 6);
+            break;
+        }
     }  
 }
