@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class bombGameSystem : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class bombGameSystem : MonoBehaviour
     public GameObject bombObject;
     public GameObject playerObject;
     public GameObject enemyObject;
+    public GameObject deadEnemy;
     private RectTransform bombTransform;
     private RectTransform playerTransform;
     private RectTransform enemyTransform;
@@ -20,6 +22,8 @@ public class bombGameSystem : MonoBehaviour
     private float playerSpeed = 50f;
 
     void OnEnable(){
+        deadEnemy.SetActive(false);
+        enemyObject.SetActive(true);
         tookAction = false;
         bombTransform = bombObject.GetComponent<RectTransform>();
         playerTransform = playerObject.GetComponent<RectTransform>();
@@ -35,6 +39,7 @@ public class bombGameSystem : MonoBehaviour
 
     }
 
+    // Update is called once per frame
     void Update()
     {
         if(gameFinished) return;
@@ -96,6 +101,10 @@ public class bombGameSystem : MonoBehaviour
         Vector2 position = bombTransform.anchoredPosition;
 
         if(position.y <= -MAX_POSITION){
+            deadEnemy.transform.position = enemyTransform.position;
+            deadEnemy.SetActive(true);
+            enemyObject.SetActive(false);
+
             StartCoroutine(endGame()); // IF we want to make a super small bomb animation before destroying the object
             gameFinished = true;
             return;
@@ -107,6 +116,7 @@ public class bombGameSystem : MonoBehaviour
     }
 
     IEnumerator endGame(){
+
         yield return new WaitForSeconds(animationTime);
         gameObject.SetActive(false);
         GameManager.playerMove = true;

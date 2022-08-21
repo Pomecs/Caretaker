@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public float speed;
     private Rigidbody2D rb;
     private Vector2 moveAmount;
+    private Animator anim;
 
     // Dash variables
     public float dashSpeed;
@@ -18,6 +19,7 @@ public class Player : MonoBehaviour
     public void Start(){
         rb = GetComponent<Rigidbody2D>();
         activeMoveSpeed = speed;
+        anim = GetComponent<Animator>();
     }
 
     public void Update(){
@@ -26,6 +28,14 @@ public class Player : MonoBehaviour
         if(GameManager.playerMove){
        
             Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+           
+
+            if(moveInput != Vector2.zero){
+                anim.SetBool("isRunning", true);
+            } else {
+                anim.SetBool("isRunning", false);
+            }
             // makes sure the player doesn't move faster when moving diagonally!
             moveAmount = moveInput.normalized * activeMoveSpeed;
             if(Input.GetKeyDown(KeyCode.Space) && !GameManager.dodgeDisabled){
@@ -33,7 +43,11 @@ public class Player : MonoBehaviour
             }
 
             DecreaseDashCounters();
+        } else {
+            moveAmount = Vector2.zero;
         }
+
+        
 
     }
     private void DecreaseDashCounters(){

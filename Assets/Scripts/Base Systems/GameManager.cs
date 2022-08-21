@@ -7,6 +7,9 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
+
+    public Animator bossAnim;
+    public SceneTransition sceneTransition;
     public float roundTimeLimit;
     public float timeBtwRequests;
     public float lastBattleAnimTime;
@@ -32,23 +35,25 @@ public class GameManager : MonoBehaviour
         RoundThree,
         FinalBattle,
         EndGame,
-        Reset
+        Reset,
+        SpecialMove
     }
 
     public static gameState currentGameState;
-    public static gameState lastGameState;
+    private static gameState lastGameState;
 
     // change to static methods
     public static bool dodgeDisabled = false;
     public static bool playerMove = true;
 
     private static int score = 0;
-    private int finalScore = 0;
+    private static int finalScore = 0;
     private Timer roundTimer;
     private Timer requestTimer;
     private Timer lastBattleTimer;
     private static bool isRoundFinished;
     public static bool startedFinalBattle;
+    public static bool tutorial = true;
 
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
@@ -56,14 +61,18 @@ public class GameManager : MonoBehaviour
         roundText = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
         finalBattleText = GameObject.Find("FinalBattleText").GetComponent<TextMeshProUGUI>();
         finalBattleText.gameObject.SetActive(false);
+
+       
         currentGameState = gameState.Intro;
         lastGameState = currentGameState;
         score = 0;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
-        isRoundFinished = false;
+        isRoundFinished = tutorial ? false : true;
         startedFinalBattle = false;
     }
+
+    private bool endGame;
 
     void Start()
     {
@@ -75,16 +84,31 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        
         if(isRoundFinished){ // changed in resetRound
             currentGameState = lastGameState;
             nextState();
-            updateRoundText();
-            updateScoreText();
-            updateTimerText();
-            isRoundFinished = false;
-            startedFinalBattle = false;
-            StartCoroutine(startRound());
-            Debug.Log("CURRENT HIGSCORE!!!: " + finalScore);
+            if(currentGameState != gameState.EndGame){
+
+                if(currentGameState == gameState.FinalBattle && finalScore < 50){
+                    sceneTransition.LoadScene("EndGame");
+                    return;
+                }
+                   updateRoundText();
+                   updateScoreText();
+                   updateTimerText();
+                   isRoundFinished = false;
+                   startedFinalBattle = false;
+                   StartCoroutine(startRound());
+            } 
+           
+           
+        }
+
+        if(score > 30 && currentGameState == gameState.FinalBattle){
+            Debug.Log("going to start my final move");
+            roundTimer.setTimer(00f); 
+            
         }
 
         switch(currentGameState){
@@ -103,8 +127,11 @@ public class GameManager : MonoBehaviour
             case gameState.FinalBattle: // FIX FINAL BATTLE STATE!!!!
                 timersUpdate();
             break;
+            case gameState.SpecialMove:
+                 timersUpdate();
+            break;
             case gameState.EndGame:
-
+                StartCoroutine(deathSequence());
             break;
             case gameState.Reset:
                 resetRound();
@@ -112,6 +139,20 @@ public class GameManager : MonoBehaviour
         }
         updateStations();
     }
+
+  
+    private IEnumerator deathSequence(){ 
+        
+        // show boss animation hurt, then load.
+        endGame = true;
+        bossAnim.SetTrigger("Death");
+        yield return new WaitForSeconds(5); 
+        sceneTransition.LoadScene("EndGame");
+    }
+
+
+
+    
 
     IEnumerator startRound(){
         subscribeTimers();
@@ -138,12 +179,18 @@ public class GameManager : MonoBehaviour
                 bombStation.setDisabled(true);
                 finalStation.setDisabled(true);
             break;
-            case gameState.FinalBattle:
+            case gameState.FinalBattle://gameState.FinalBattle:
+                holdStation.setDisabled(false);
+                sequenceStation.setDisabled(false);
+                bombStation.setDisabled(false);
+                finalStation.setDisabled(false);
+            break;
+            case gameState.SpecialMove:
                 holdStation.setDisabled(true);
                 sequenceStation.setDisabled(true);
                 bombStation.setDisabled(true);
                 finalStation.setDisabled(false);
-            break;
+                break;
             default:
                 holdStation.setDisabled(false);
                 sequenceStation.setDisabled(false);
@@ -151,6 +198,10 @@ public class GameManager : MonoBehaviour
                 finalStation.setDisabled(true);
             break;
         }
+    }
+
+    public static int getFinalScore(){
+        return finalScore;
     }
 
     public static void nextState(){
@@ -174,11 +225,15 @@ public class GameManager : MonoBehaviour
     private static void updateScoreText(){
         scoreText.text = score.ToString();
     }
-
+    private int bossRoundCounter = 0;
     public void sendNewRequest(){ // Maybe set isPlayerAtRightStation to false here
         currentRequest?.SetActive(false);
 
-        int rand = UnityEngine.Random.Range(0, requests.Length);
+        int rand = currentGameState == gameState.FinalBattle ? bossRoundCounter : UnityEngine.Random.Range(0, requests.Length);
+        bossRoundCounter = currentGameState == gameState.FinalBattle ? ++bossRoundCounter : 0;
+        if(bossRoundCounter > requests.Length -1){
+            bossRoundCounter = 0;
+        }
         currentRequest = requests[rand];
         currentRequest.SetActive(true);
     }
@@ -208,7 +263,9 @@ public class GameManager : MonoBehaviour
         checkScore();
         currentRequest?.SetActive(false);
         currentRequest = null;
-        roundTimer = new Timer(roundTimeLimit, false);
+        
+
+        roundTimer = lastGameState == gameState.RoundThree ? new Timer(45f, false) : new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
         score = 0;
         currentGameState = lastGameState;
@@ -227,7 +284,8 @@ public class GameManager : MonoBehaviour
     public void subscribeTimers(){
         requestTimer.onTimerEnd += sendNewRequest;
         roundTimer.onTimerStart += updateTimerText;
-        roundTimer.onTimerEnd += setupFinalBattle;
+
+        roundTimer.onTimerEnd += currentGameState == gameState.FinalBattle ? setupBossFight : setupFinalBattle;
     }
 
     public void checkFinalEncounter(){
@@ -239,6 +297,7 @@ public class GameManager : MonoBehaviour
     }
 
     void setupFinalBattle(){
+
         lastBattleTimer = new Timer(timeToLastBattle, false);
         lastBattleTimer.onTimerStart += updateTimerText;
         lastBattleTimer.onTimerEnd += checkFinalEncounter;
@@ -246,12 +305,43 @@ public class GameManager : MonoBehaviour
         finalBattleText.gameObject.SetActive(true);
         StartCoroutine(startFinalBattle());
     }
+    private void setupBossFight(){
+        Debug.Log("BOSS FIIIIIIIIIGHT");
+        currentRequest?.SetActive(false);
+        StartCoroutine(startBossAnimation());
+    }
+    public IEnumerator startBossAnimation(){
 
+        bossAnim.SetTrigger("FinalRound");
+        requestTimer.setTimerActive(); // turning it off
+        yield return new WaitForSeconds(3);
+        startBossBattle();
+    }
+
+    private void startBossBattle(){
+        lastBattleTimer = new Timer(timeToLastBattle, false);
+        lastBattleTimer.onTimerStart += updateTimerText;
+        lastBattleTimer.onTimerEnd += checkFinalEncounter;
+        finalBattleText.text = "FINISH HIM!";
+        finalBattleText.gameObject.SetActive(true);
+        StartCoroutine(bossBattle());
+    }
+
+    public IEnumerator bossBattle(){
+        lastGameState = currentGameState;
+        yield return new WaitForSeconds(lastBattleAnimTime);
+
+        currentGameState = gameState.SpecialMove;
+        finalBattleText.gameObject.SetActive(false);
+        //lastBattleTimer.setTimerActive(); // starting
+        
+        
+    }
     public IEnumerator startFinalBattle(){
         lastGameState = currentGameState;
         yield return new WaitForSeconds(lastBattleAnimTime);
 
-        currentGameState = gameState.FinalBattle;
+        currentGameState = gameState.SpecialMove;
         finalBattleText.gameObject.SetActive(false);
         lastBattleTimer.setTimerActive(); // starting
         requestTimer.setTimerActive(); // turning it off
