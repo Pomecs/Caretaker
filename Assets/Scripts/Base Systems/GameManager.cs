@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     }
 
     public static gameState currentGameState;
-    private static gameState lastGameState;
+    public static gameState lastGameState;
 
     // change to static methods
     public static bool dodgeDisabled = false;
@@ -82,7 +82,9 @@ public class GameManager : MonoBehaviour
             updateScoreText();
             updateTimerText();
             isRoundFinished = false;
+            startedFinalBattle = false;
             StartCoroutine(startRound());
+            Debug.Log("CURRENT HIGSCORE!!!: " + finalScore);
         }
 
         switch(currentGameState){
@@ -204,7 +206,7 @@ public class GameManager : MonoBehaviour
 
     public void resetRound(){
         checkScore();
-        currentRequest.SetActive(false);
+        currentRequest?.SetActive(false);
         currentRequest = null;
         roundTimer = new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
