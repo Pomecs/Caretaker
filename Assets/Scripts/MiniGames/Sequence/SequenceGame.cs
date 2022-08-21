@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class SequenceGame : MonoBehaviour
 {
-
+    public AudioClip[] hitSounds;
     private ProgressBar progressBar;
     private KeyCode previousKey = KeyCode.None;
- 
+    private AudioSource audioSource;
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         progressBar = GetComponentInChildren<ProgressBar>();
     }
 
@@ -18,9 +19,13 @@ public class SequenceGame : MonoBehaviour
 
         if(previousKey != KeyCode.None){
             if(Input.GetKeyDown(KeyCode.LeftArrow) && previousKey != KeyCode.LeftArrow){
+                audioSource.clip = hitSounds[Random.Range(0, hitSounds.Length - 1)];
+                audioSource.PlayOneShot(audioSource.clip);
                 progressBar.IncreaseValue();
                 previousKey = KeyCode.LeftArrow;
             } else if(Input.GetKeyDown(KeyCode.RightArrow) && previousKey != KeyCode.RightArrow){
+                audioSource.clip = hitSounds[Random.Range(0, hitSounds.Length - 1)];
+                audioSource.PlayOneShot(audioSource.clip);
                 progressBar.IncreaseValue();
                 previousKey = KeyCode.RightArrow;
             }

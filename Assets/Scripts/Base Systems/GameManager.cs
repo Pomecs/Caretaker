@@ -7,7 +7,8 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
-
+    public AudioClip[] randomSounds;
+    public int scoreToReachFinal;
     public Animator bossAnim;
     public SceneTransition sceneTransition;
     public float roundTimeLimit;
@@ -27,7 +28,6 @@ public class GameManager : MonoBehaviour
     public static TextMeshProUGUI scoreText;
     public static TextMeshProUGUI roundText;
     public static TextMeshProUGUI finalBattleText;
-
     public enum gameState{
         Intro,
         RoundOne,
@@ -38,30 +38,30 @@ public class GameManager : MonoBehaviour
         Reset,
         SpecialMove
     }
-
     public static gameState currentGameState;
     public static gameState lastGameState;
-
-    // change to static methods
     public static bool dodgeDisabled = false;
     public static bool playerMove = true;
-
     private static int score = 0;
-    private static int finalScore = 0;
     private Timer roundTimer;
     private Timer requestTimer;
     private Timer lastBattleTimer;
     private static bool isRoundFinished;
     public static bool startedFinalBattle;
     public static bool tutorial = true;
+    private bool endGame;
+    private int bossRoundCounter = 0;
+    private AudioSource audioSource;
+    private float spawnSounds;
 
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
         roundText = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
+        audioSource = GetComponent<AudioSource>();
         finalBattleText = GameObject.Find("FinalBattleText").GetComponent<TextMeshProUGUI>();
         finalBattleText.gameObject.SetActive(false);
-
+        spawnSounds = 100;
        
         currentGameState = gameState.Intro;
         lastGameState = currentGameState;
@@ -71,8 +71,6 @@ public class GameManager : MonoBehaviour
         isRoundFinished = tutorial ? false : true;
         startedFinalBattle = false;
     }
-
-    private bool endGame;
 
     void Start()
     {
@@ -84,13 +82,21 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // FUCKING NOT WORKING!!!!
+        if(spawnSounds <= 0 && !isRoundFinished){
+            audioSource.clip = randomSounds[UnityEngine.Random.Range(0, randomSounds.Length - 1)];
+            audioSource.PlayOneShot(audioSource.clip);
+            spawnSounds = 100;
+        } else {
+            spawnSounds -= Time.deltaTime;
+        }
         
         if(isRoundFinished){ // changed in resetRound
             currentGameState = lastGameState;
             nextState();
             if(currentGameState != gameState.EndGame){
 
-                if(currentGameState == gameState.FinalBattle && finalScore < 50){
+                if(currentGameState == gameState.FinalBattle && score < scoreToReachFinal){
                     sceneTransition.LoadScene("EndGame");
                     return;
                 }
@@ -140,19 +146,17 @@ public class GameManager : MonoBehaviour
         updateStations();
     }
 
-  
-    private IEnumerator deathSequence(){ 
-        
+    public static int getScore(){
+        return score;
+    }
+
+    private IEnumerator deathSequence(){     
         // show boss animation hurt, then load.
         endGame = true;
         bossAnim.SetTrigger("Death");
         yield return new WaitForSeconds(5); 
         sceneTransition.LoadScene("EndGame");
     }
-
-
-
-    
 
     IEnumerator startRound(){
         subscribeTimers();
@@ -200,10 +204,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public static int getFinalScore(){
-        return finalScore;
-    }
-
     public static void nextState(){
         currentGameState++;
     }
@@ -225,8 +225,8 @@ public class GameManager : MonoBehaviour
     private static void updateScoreText(){
         scoreText.text = score.ToString();
     }
-    private int bossRoundCounter = 0;
-    public void sendNewRequest(){ // Maybe set isPlayerAtRightStation to false here
+
+    public void sendNewRequest(){
         currentRequest?.SetActive(false);
 
         int rand = currentGameState == gameState.FinalBattle ? bossRoundCounter : UnityEngine.Random.Range(0, requests.Length);
@@ -255,7 +255,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void updateRoundText(){
+    public void updateRoundText(){ // SWITCH FOR NICER NAMES!!!
         roundText.text = currentGameState.ToString();
     }
 
@@ -263,7 +263,6 @@ public class GameManager : MonoBehaviour
         checkScore();
         currentRequest?.SetActive(false);
         currentRequest = null;
-        
 
         roundTimer = lastGameState == gameState.RoundThree ? new Timer(45f, false) : new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
@@ -277,7 +276,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("YOU LOST THE ROUND!!!!");
         } else {
             Debug.Log("YOU WON THE ROUND!!!!");
-            finalScore += score;
         }
     }
 
@@ -297,7 +295,6 @@ public class GameManager : MonoBehaviour
     }
 
     void setupFinalBattle(){
-
         lastBattleTimer = new Timer(timeToLastBattle, false);
         lastBattleTimer.onTimerStart += updateTimerText;
         lastBattleTimer.onTimerEnd += checkFinalEncounter;
@@ -305,11 +302,12 @@ public class GameManager : MonoBehaviour
         finalBattleText.gameObject.SetActive(true);
         StartCoroutine(startFinalBattle());
     }
+
     private void setupBossFight(){
-        Debug.Log("BOSS FIIIIIIIIIGHT");
         currentRequest?.SetActive(false);
         StartCoroutine(startBossAnimation());
     }
+
     public IEnumerator startBossAnimation(){
 
         bossAnim.SetTrigger("FinalRound");
@@ -334,9 +332,8 @@ public class GameManager : MonoBehaviour
         currentGameState = gameState.SpecialMove;
         finalBattleText.gameObject.SetActive(false);
         //lastBattleTimer.setTimerActive(); // starting
-        
-        
     }
+
     public IEnumerator startFinalBattle(){
         lastGameState = currentGameState;
         yield return new WaitForSeconds(lastBattleAnimTime);

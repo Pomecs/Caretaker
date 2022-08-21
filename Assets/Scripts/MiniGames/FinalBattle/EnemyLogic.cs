@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyLogic : MonoBehaviour
 {
     private float speed;
-
+    
     void FixedUpdate()
     {
         switch(GameManager.lastGameState){

@@ -1862,6 +1862,7 @@ GameObject:
   - component: {fileID: 783220227}
   - component: {fileID: 783220229}
   - component: {fileID: 783220230}
+  - component: {fileID: 783220231}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1949,6 +1950,26 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.2111237, y: 0.20178792}
   m_EdgeRadius: 0
+--- !u!95 &783220231
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783220226}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 269b0a2ca0c233c4cb128e4a8e2cd431, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &807232096
 GameObject:
   m_ObjectHideFlags: 0
@@ -2216,7 +2237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd59c11409004b8ea66de89d35d7952, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startTimeBtwSpawns: 1
   enemies:
   - {fileID: 530258163559010351, guid: 0f0f85de6d9004b039dc4ceed50ef197, type: 3}
   - {fileID: 8376172728552268109, guid: 9f9bf2ae4f158471091e0c36784fbbdb, type: 3}
@@ -2798,8 +2818,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationTime: 2
-  maxTries: 5
-  targetValue: 15
   livesObjects:
   - {fileID: 455457197}
   - {fileID: 260926803}
@@ -3999,6 +4017,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dde2021def0b4c48b95109f1c7ee364, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossAnim: {fileID: 0}
+  sceneTransition: {fileID: 0}
   roundTimeLimit: 10
   timeBtwRequests: 5
   lastBattleAnimTime: 2

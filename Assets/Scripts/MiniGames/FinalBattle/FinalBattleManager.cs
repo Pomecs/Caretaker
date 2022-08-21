@@ -7,14 +7,20 @@ public class FinalBattleManager : MonoBehaviour
     public float animationTime;
     private int maxTries;
     private int targetValue;
+    public AudioClip[] hitSounds;
+    public AudioClip[] missSounds;
     public GameObject[] livesObjects;
+    private static AudioClip currentMissSound;
+    private static AudioClip currentHitSound;
     public static int currentTarget;
     public static int currentTries;
     private static int score;
     public static bool running;
+    private static AudioSource audioSource;
 
     void OnEnable()
     {
+        audioSource = GetComponent<AudioSource>();
         score = 0;
         running = true;
         setTarget();
@@ -37,6 +43,9 @@ public class FinalBattleManager : MonoBehaviour
     
     void Update()
     {
+        currentHitSound = hitSounds[Random.Range(0, hitSounds.Length - 1)];
+        currentMissSound = missSounds[Random.Range(0, missSounds.Length - 1)];
+
         if(currentTries <= 0){ // lose
             livesObjects[0]?.SetActive(false);
             StartCoroutine(endGame());
@@ -77,10 +86,12 @@ public class FinalBattleManager : MonoBehaviour
     }
 
     public static void decreaseTries(){
+        audioSource.PlayOneShot(currentMissSound);
         currentTries--;
     }
 
     public static void hitTarget(){
+        audioSource.PlayOneShot(currentHitSound);
         currentTarget--;
     }
 

@@ -9,7 +9,7 @@ public class EndScene : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-     if(GameManager.getFinalScore() < 10){
+     if(GameManager.getScore() < 10){
         backgroundImage.color = Color.black;
      } else {
         backgroundImage.color = Color.blue;
