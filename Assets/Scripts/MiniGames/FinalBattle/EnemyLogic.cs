@@ -7,7 +7,20 @@ public class EnemyLogic : MonoBehaviour
     public float speed;
     void Update()
     {
-        transform.Translate(Vector2.left * speed * Time.deltaTime);
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundOne:
+                transform.Translate(Vector2.left * speed * Time.deltaTime);
+            break;
+            case GameManager.gameState.RoundTwo:
+                transform.Translate(Vector2.left * speed * 1.5f * Time.deltaTime);
+            break;
+            case GameManager.gameState.RoundThree:
+                transform.Translate(Vector2.left * speed * 2 * Time.deltaTime);
+            break;
+            default:
+                transform.Translate(Vector2.left * speed * 1.5f * Time.deltaTime);
+            break;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other){

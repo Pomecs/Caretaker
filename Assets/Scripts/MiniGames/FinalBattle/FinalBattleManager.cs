@@ -5,8 +5,8 @@ using UnityEngine;
 public class FinalBattleManager : MonoBehaviour
 {
     public float animationTime;
-    public int maxTries;
-    public int targetValue;
+    private int maxTries;
+    private int targetValue;
     public GameObject[] livesObjects;
     public static int currentTarget;
     public static int currentTries;
@@ -16,14 +16,20 @@ public class FinalBattleManager : MonoBehaviour
     void OnEnable()
     {
         running = true;
-        currentTarget = targetValue;
-        currentTries = maxTries;
+        setTries();
         GameManager.startedFinalBattle = true;
+        setUpGame();
     }
 
     void OnDisable(){
         GameManager.setState(GameManager.gameState.Reset);
         resetGame();
+    }
+
+    void setUpGame(){
+        for(int i = 0; i < maxTries; i++){
+            livesObjects[i].SetActive(true);
+        }
     }
 
     void resetGame(){
@@ -45,10 +51,33 @@ public class FinalBattleManager : MonoBehaviour
             livesObjects[currentTries]?.SetActive(false);
         }
 
-        if(currentTarget <= 0){ // win
-            GameManager.increaseScore(score);
+        if(currentTarget <= 0 && running){ // win
+            running = false;
             StartCoroutine(endGame());
         }
+    }
+
+    void setTries(){
+        switch(GameManager.currentGameState){
+            case GameManager.gameState.RoundOne:
+                maxTries = 5;
+                targetValue = 15;
+            break;
+            case GameManager.gameState.RoundTwo:
+                maxTries = 4;
+                targetValue = 20;
+            break;
+            case GameManager.gameState.RoundThree:
+                maxTries = 3;
+                targetValue = 25;
+            break;
+            default:
+                maxTries = 5;
+                targetValue = 15;
+            break;
+        }
+        currentTarget = targetValue;
+        currentTries = maxTries;
     }
 
     public static int getTries(){
@@ -68,7 +97,7 @@ public class FinalBattleManager : MonoBehaviour
     }
 
     IEnumerator endGame(){
-        running = false;
+        GameManager.increaseScore(score);
         yield return new WaitForSeconds(animationTime);
         gameObject.SetActive(false);
         GameManager.playerMove = true;

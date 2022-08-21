@@ -18,7 +18,6 @@ public class HoldAndRelease : MonoBehaviour
     private void OnEnable(){
         bar = GetComponentInChildren<Slider>();
         ob = gameOb.GetComponent<ObjectiveBox>();
-        Debug.Log(bar);
         currentBar = maxBar;
         bar.maxValue = maxBar;
         bar.value = 0;
