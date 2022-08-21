@@ -8,13 +8,11 @@ public class SequenceGame : MonoBehaviour
     private ProgressBar progressBar;
     private KeyCode previousKey = KeyCode.None;
  
-    // Start is called before the first frame update
     void Start()
     {
         progressBar = GetComponentInChildren<ProgressBar>();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
