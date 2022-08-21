@@ -39,7 +39,7 @@ public class HoldAndRelease : MonoBehaviour
             pressed = false;
 
             if(ob.WithinRange(bar.value)){
-                if(GameManager.currentGameState != GameManager.gameState.Intro){
+                if(GameManager.currentGameState != GameManager.gameState.Intro && GameManager.isPlayerAtRightStation){
                     GameManager.increaseScore(10);
                 }    
             }

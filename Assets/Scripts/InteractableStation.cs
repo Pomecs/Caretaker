@@ -10,7 +10,6 @@ public class InteractableStation : MonoBehaviour
     public GameObject gameToPlay;
     public GameObject requestObject;
     private bool disabled = false;
-    private bool isActive = false;
     private SpriteRenderer spriteRenderer;
     
     public void Start() {
@@ -21,7 +20,7 @@ public class InteractableStation : MonoBehaviour
     public void Update() {
 
         if(Input.GetKeyDown(KeyCode.Space) && inRange && !disabled){
-            isActive = true;
+            GameManager.isPlayerAtRightStation = GameObject.ReferenceEquals( GameManager.currentRequest, requestObject);
             GameManager.dodgeDisabled = true;
             GameManager.playerMove = false;
             gameToPlay?.SetActive(true);
@@ -49,7 +48,6 @@ public class InteractableStation : MonoBehaviour
     private IEnumerator StopCooldown(int secs){
         yield return new WaitForSeconds(secs);
         setDisabled(false);
-        isActive = false;
     }
 
     private void OnTriggerEnter2D(Collider2D other) {

@@ -12,14 +12,14 @@ public class GameManager : MonoBehaviour
     public float lastBattleAnimTime;
     public float timeToLastBattle;
     public int targetRoundScore;
-    public InteractableStation[] stations; // testing
     public InteractableStation holdStation;
     public InteractableStation bombStation;
     public InteractableStation sequenceStation;
     public InteractableStation finalStation;
     public GameObject finalBattleRequest;
     public GameObject[] requests;
-    private GameObject currentRequest;
+    public static GameObject currentRequest;
+    public static bool isPlayerAtRightStation;
     public static TextMeshProUGUI timerText;
     public static TextMeshProUGUI scoreText;
     public static TextMeshProUGUI roundText;
@@ -47,7 +47,6 @@ public class GameManager : MonoBehaviour
     private Timer roundTimer;
     private Timer requestTimer;
     private Timer lastBattleTimer;
-    private GameObject requestSpawner;
     private static bool isRoundFinished;
     public static bool startedFinalBattle;
 
@@ -56,7 +55,6 @@ public class GameManager : MonoBehaviour
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
         roundText = GameObject.Find("RoundText").GetComponent<TextMeshProUGUI>();
         finalBattleText = GameObject.Find("FinalBattleText").GetComponent<TextMeshProUGUI>();
-        requestSpawner = GameObject.Find("RequestSpawner");
         finalBattleText.gameObject.SetActive(false);
         currentGameState = gameState.Intro;
         lastGameState = currentGameState;
@@ -124,19 +122,6 @@ public class GameManager : MonoBehaviour
         sendNewRequest();
     }
 
-    private bool checkActiveStation(){ // Use to check if player is using right station???
-        bool result = false;
-
-        foreach(InteractableStation station in stations){
-            if(station.requestObject == currentRequest) {
-                result = true;
-                break;
-            }
-        }
-
-        return result;
-    }
-
     private void timersUpdate(){
         roundTimer.update();
         requestTimer.update();
@@ -188,7 +173,7 @@ public class GameManager : MonoBehaviour
         scoreText.text = score.ToString();
     }
 
-    public void sendNewRequest(){
+    public void sendNewRequest(){ // Maybe set isPlayerAtRightStation to false here
         currentRequest?.SetActive(false);
 
         int rand = UnityEngine.Random.Range(0, requests.Length);
