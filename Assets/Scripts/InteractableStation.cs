@@ -26,7 +26,7 @@ public class InteractableStation : MonoBehaviour
             gameToPlay?.SetActive(true);
             // afterwards, trigger cooldown
             TriggerCooldown();
-        }
+        } 
         
     }
 
@@ -51,7 +51,7 @@ public class InteractableStation : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        GameManager.dodgeDisabled = true;
+      
         // this check isn't necessary for now, but here just in case we add other moving parts later (like powerups or annoying creatures)
         if(other.gameObject.CompareTag("Player")){
             inRange = true;

@@ -15,17 +15,17 @@ public class ProgressBar : MonoBehaviour
         bar = GetComponent<Slider>();
         currentBar = maxBar;
         bar.maxValue = maxBar;
-        bar.value = 50;
+        bar.value = 80;
         setSpeed();
     }
 
     void Update()
     {
-        if(bar.value == 0){
+        if(bar.value == 100){
             FindObjectOfType<SequenceGame>().Disable();
         } 
 
-        if(bar.value == maxBar){
+        if(bar.value == 0){
             if(GameManager.isPlayerAtRightStation){
                 GameManager.increaseScore(10);
             }
@@ -33,16 +33,16 @@ public class ProgressBar : MonoBehaviour
             FindObjectOfType<SequenceGame>().Disable();
         }
 
-        bar.value -= Time.deltaTime * speed;
+        bar.value += Time.deltaTime * speed;
     }
 
     void setSpeed(){
         switch(GameManager.currentGameState){
             case GameManager.gameState.RoundTwo:
-                speed = Random.Range(6, 9);
+                speed = Random.Range(5, 6);
             break;
             case GameManager.gameState.RoundThree:
-                speed = Random.Range(10, 14);
+                speed = Random.Range(4, 7);
             break;
             default:
                 speed = Random.Range(4, 6);
@@ -53,13 +53,13 @@ public class ProgressBar : MonoBehaviour
     public void IncreaseValue(){
         switch(GameManager.currentGameState){
             case GameManager.gameState.RoundTwo:
-                bar.value += Random.Range(3, 5);
+                bar.value -= Random.Range(5, 5);
             break;
             case GameManager.gameState.RoundThree:
-                bar.value += Random.Range(2, 4);
+                bar.value -= Random.Range(4, 6);
             break;
             default:
-                bar.value += Random.Range(4, 6);
+                bar.value -= Random.Range(4, 6);
             break;
         }
     }  

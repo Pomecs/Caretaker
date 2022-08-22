@@ -5,20 +5,27 @@ using UnityEngine;
 public class EndScene : MonoBehaviour
 {
 
-    public SpriteRenderer backgroundImage;
+    public GameObject losingScene;
+    public GameObject winningScene;
+    public SceneTransition sceneTransition;
+
     // Start is called before the first frame update
-    void Start()
-    {
-     if(GameManager.getScore() < 10){
-        backgroundImage.color = Color.black;
+    void Start(){
+    
+     if(GameManager.getScore() < 500){
+       losingScene.SetActive(true);
      } else {
-        backgroundImage.color = Color.blue;
+        winningScene.SetActive(true);
      }
     }
 
     // Update is called once per frame
     void Update()
     {
+
+      if(Input.GetKeyDown(KeyCode.Space)){
+        sceneTransition.LoadScene("restart");
+      }
         
     }
 }

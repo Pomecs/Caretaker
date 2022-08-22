@@ -9,6 +9,7 @@ public class bombGameSystem : MonoBehaviour
     public GameObject bombObject;
     public GameObject playerObject;
     public GameObject enemyObject;
+    
     private RectTransform bombTransform;
     private RectTransform playerTransform;
     private RectTransform enemyTransform;
@@ -16,11 +17,12 @@ public class bombGameSystem : MonoBehaviour
     private bool tookAction;
     private bool gameFinished;
     private int bombSpeed = 1;
-    private float bombFallSpeed = 90f;
-    private float playerSpeed = 50f;
+    private float bombFallSpeed = 100f;
+    private float playerSpeed = 30f;
 
     void OnEnable(){
         tookAction = false;
+        enemyObject.SetActive(true);
         bombTransform = bombObject.GetComponent<RectTransform>();
         playerTransform = playerObject.GetComponent<RectTransform>();
         enemyTransform = enemyObject.GetComponent<RectTransform>();

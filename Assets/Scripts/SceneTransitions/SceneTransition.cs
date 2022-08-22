@@ -24,11 +24,10 @@ public class SceneTransition : MonoBehaviour
     IEnumerator Transition(string sceneName) {
         
         transitionAnim.SetTrigger("end");
-        if(sceneName == "Lose"){
-            yield return new WaitForSeconds(3);   
-        }
 
+        
         if(sceneName == "restart"){
+        Debug.Log("no tutorial!");
             GameManager.tutorial = false;
             sceneName = "Game";
         }

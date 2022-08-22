@@ -8,9 +8,11 @@ public class SequenceGame : MonoBehaviour
     private ProgressBar progressBar;
     private KeyCode previousKey = KeyCode.None;
     private AudioSource audioSource;
+  
+ 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
+          audioSource = GetComponent<AudioSource>();
         progressBar = GetComponentInChildren<ProgressBar>();
     }
 
@@ -19,6 +21,7 @@ public class SequenceGame : MonoBehaviour
 
         if(previousKey != KeyCode.None){
             if(Input.GetKeyDown(KeyCode.LeftArrow) && previousKey != KeyCode.LeftArrow){
+                
                 audioSource.clip = hitSounds[Random.Range(0, hitSounds.Length - 1)];
                 audioSource.PlayOneShot(audioSource.clip);
                 progressBar.IncreaseValue();

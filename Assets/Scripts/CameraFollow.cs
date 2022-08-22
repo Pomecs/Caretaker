@@ -16,11 +16,17 @@ public class CameraFollow : MonoBehaviour
     }
 
     private void Update() {
+
+
         if(playerTransform != null){
             // value will either be player position or minX/maxX if player position is out of those bounds.
             float clampedX = Mathf.Clamp(playerTransform.position.x, minX, maxX);
             float clampedY = Mathf.Clamp(playerTransform.position.y, minY, maxY);
             transform.position = Vector2.Lerp(transform.position, new Vector2(clampedX, clampedY), speed);
+        }
+
+        if(Input.GetKeyDown(KeyCode.F)){
+          //  GameManager.cutscene = true;
         }
     }
 

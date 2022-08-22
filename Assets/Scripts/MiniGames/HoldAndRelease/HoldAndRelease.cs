@@ -7,6 +7,7 @@ public class HoldAndRelease : MonoBehaviour
 {
     public AudioClip[] winSounds;
     public AudioClip[] loseSounds;
+    private AudioSource audioSource;
     private Slider bar;
     public float speed;
     private int maxBar = 100;
@@ -15,10 +16,9 @@ public class HoldAndRelease : MonoBehaviour
 
     public GameObject gameOb;
     private ObjectiveBox ob;
-    private AudioSource audioSource;
     
     private void OnEnable(){
-        audioSource = GetComponent<AudioSource>();
+         audioSource = GetComponent<AudioSource>();
         bar = GetComponentInChildren<Slider>();
         ob = gameOb.GetComponent<ObjectiveBox>();
         currentBar = maxBar;
@@ -30,16 +30,16 @@ public class HoldAndRelease : MonoBehaviour
     void setUpSpeed(){
         switch(GameManager.currentGameState){
             case GameManager.gameState.RoundTwo:
-                speed = Random.Range(0.2f, 0.4f);
+                speed = Random.Range(0.4f, 0.5f);
             break;
             case GameManager.gameState.RoundThree:
-                speed = Random.Range(0.9f, 1.1f);
+                speed = Random.Range(0.4f, 0.4f);
             break;
             case GameManager.gameState.FinalBattle:
-                speed = Random.Range(0.6f, 0.8f);
+                speed = Random.Range(0.4f, 0.5f);
             break;
             default:
-                speed = 0.4f;
+                speed = 0.3f;
             break;
         }
     }
@@ -56,15 +56,12 @@ public class HoldAndRelease : MonoBehaviour
         }
 
         if(Input.GetKeyUp(KeyCode.DownArrow)){
-            if(!pressed){
-                return;
-            }
             pressed = false;
 
             if(ob.WithinRange(bar.value)){
                 if(GameManager.currentGameState != GameManager.gameState.Intro && GameManager.isPlayerAtRightStation){
                     GameManager.increaseScore(10);
-                }
+                }    
                 audioSource.clip = winSounds[Random.Range(0, winSounds.Length - 1)];
                 audioSource.PlayOneShot(audioSource.clip);
             } else {

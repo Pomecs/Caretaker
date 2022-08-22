@@ -4,19 +4,20 @@ using UnityEngine;
 
 public class collisionDetector : MonoBehaviour
 {
-    public AudioClip[] bombSounds;
-    private AudioSource audioSource;
 
-    void Awake(){
-        audioSource = GetComponent<AudioSource>();
+    public GameObject deadSprite;
+    
+
+    private void OnEnable() {
+        deadSprite.SetActive(false);  
+
     }
-
     void OnTriggerEnter2D(Collider2D col){
         // we can check if player? col.gameObject.tag.Equals("Player")
         if(GameManager.isPlayerAtRightStation){
+            deadSprite.SetActive(true);
+            gameObject.SetActive(false);
             GameManager.increaseScore(20);
-        }
-        audioSource.clip = bombSounds[Random.Range(0, bombSounds.Length - 1)];
-        audioSource.PlayOneShot(audioSource.clip);
+        }    
     }
 }

@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
     private AudioSource audioSource;
     private float spawnSounds;
 
+
     void Awake(){
         timerText = GameObject.Find("Timer").GetComponent<TextMeshProUGUI>();
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
@@ -82,6 +83,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+
         // FUCKING NOT WORKING!!!!
         if(spawnSounds <= 0 && !isRoundFinished){
             audioSource.clip = randomSounds[UnityEngine.Random.Range(0, randomSounds.Length - 1)];
@@ -160,7 +162,20 @@ public class GameManager : MonoBehaviour
 
     IEnumerator startRound(){
         subscribeTimers();
-        finalBattleText.text = $"{currentGameState} is about to start!";
+        
+        
+        switch(currentGameState){
+            case gameState.FinalBattle:
+            finalBattleText.text = $"REVENGE";
+            break;
+            case gameState.SpecialMove:
+            finalBattleText.text = $"FINAL MOVE";
+            break;
+            default:
+            finalBattleText.text = $"ANOTHER DAY ANOTHER DEATH";
+            break;
+        }
+        
         finalBattleText.gameObject.SetActive(true);
         yield return new WaitForSeconds(2);
         finalBattleText.gameObject.SetActive(false);
@@ -266,7 +281,7 @@ public class GameManager : MonoBehaviour
 
         roundTimer = lastGameState == gameState.RoundThree ? new Timer(45f, false) : new Timer(roundTimeLimit, false);
         requestTimer = new Timer(timeBtwRequests, true);
-        score = 0;
+        //score = 0;
         currentGameState = lastGameState;
         isRoundFinished = true;
     }
